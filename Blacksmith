@@ -1,0 +1,20 @@
+for architect
+
+forge app:
+  needs forge.o main.o
+  imbue -Wall -v
+
+forge another:
+  needs another.o main.o
+  imbue -Wall
+
+smelt main.o:
+  needs main.c rules.c
+
+smelt forge.o:
+  needs forge.c thing.c
+
+smelt another.o:
+  needs another.c
+
+scrap app
