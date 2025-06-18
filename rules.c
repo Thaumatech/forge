@@ -1,4 +1,4 @@
-#include "forge.h"
+#include "rules.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -8,7 +8,7 @@ RuleList *init_list(int capacity, char *lang) {
   if (!list)
     return NULL;
 
-  list->data = malloc(sizeof(Rule) * capacity);
+  list->data = malloc(sizeof(Rule *) * capacity);
   if (!list->data) {
     free_list(list);
     return NULL;
@@ -35,10 +35,10 @@ Rule *init_rule() {
   return rule;
 }
 
-void append(RuleList *list, Rule rule) {
+void append(RuleList *list, Rule *rule) {
   if (list->capacity <= list->size) {
     int new_capacity = list->capacity * 2;
-    Rule *new_data = realloc(list->data, list->capacity * sizeof(Rule));
+    Rule **new_data = realloc(list->data, new_capacity * sizeof(Rule *));
 
     if (!new_data) {
       printf("Appending rule failed! Blame realloc not me\n");
@@ -58,7 +58,7 @@ void free_list(RuleList *list) {
 
   if (list->data && list->size) {
     for (int i = 0; i < list->size; i++) {
-      Rule *r = &list->data[i];
+      Rule *r = list->data[i];
 
       if (r->needs.deps) {
         for (int j = 0; j < r->needs.dep_count; j++) {
@@ -73,6 +73,8 @@ void free_list(RuleList *list) {
         free(r->action);
       if (r->target)
         free(r->target);
+
+      free(r);
     }
     free(list->data);
   }

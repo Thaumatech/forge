@@ -1,5 +1,5 @@
 #pragma once
-// forge.h
+// rules.h
 
 #define STARTSWITH(str, prefix) (strncmp((str), (prefix), strlen(prefix)) == 0)
 #define STREQ(a, b) (strcmp((a), (b)) == 0)
@@ -34,7 +34,7 @@ typedef struct {
   int size;
   int capacity;
   char *lang;
-  Rule *data;
+  Rule **data;
 } RuleList;
 
 // Returns pointer to rule list
@@ -44,7 +44,7 @@ RuleList *init_list(int capacity, char *lang);
 Rule *init_rule();
 
 // Appends a Rule to the Rule List
-void append(RuleList *list, Rule rule);
+void append(RuleList *list, Rule *rule);
 
 // Free the entire Rule Lists and all of its contents
 void free_list(RuleList *list);
