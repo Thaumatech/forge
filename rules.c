@@ -27,8 +27,10 @@ RuleList *init_list(int capacity, char *lang) {
 
 Rule *init_rule() {
   Rule *rule = malloc(sizeof(Rule));
-  if (!rule)
+  if (!rule) {
+    printf("Mallocation failed for init_rule\n");
     return NULL;
+  }
 
   return rule;
 }
