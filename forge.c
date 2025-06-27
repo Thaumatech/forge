@@ -1,13 +1,7 @@
+#include "forge.h"
 #include "debug.h"
 #include "helper.h"
 #include "rules.h"
-#include <ctype.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
 
 void loading() {
   struct winsize w;
@@ -23,10 +17,9 @@ void loading() {
       "      (              ",  "      (              ",
       "      (______________",  "        |  |         ",
       "        |  |         ",  "        |__|         ",
-      "        \\__/         ",
+      "        \\__/         ", "           ",
+      "    Compiling...     ",
   };
-
-  //   int uplen = term_cols - 5;
 
   const char *strike[] = {
       "      _______                     ",
@@ -39,9 +32,9 @@ void loading() {
       "    |         |                   ",
       "    |_________|                   ",
       "_____\\_______/_____________       ",
+      "                                   ",
+      "            Compiling...           ",
   };
-
-  //   int strikelen = term_cols - 17;
 
   while (1) {
     sleep(1);
@@ -83,7 +76,7 @@ void loading() {
   }
 }
 
-void build(RuleList *rl) {
+void build_mm(RuleList *rl) {
   pid_t p = fork();
   if (p < 0) {
     perror("Fork Failed\n");
@@ -91,13 +84,19 @@ void build(RuleList *rl) {
   }
   if (p == 0) {
     printf("HELLO CHILD FORK\n");
-
     loading();
     return;
   }
   if (p > 0) {
     printf("HELLO PARENT FORK\n");
+    build(rl);
+    kill(p, SIGTERM);
     return;
+  }
+}
+
+void build(RuleList *rl) {
+  for (int i = 0; i < rl->size; i++) {
   }
 }
 
@@ -224,6 +223,7 @@ RuleList *parse(FILE *blacksmith) {
   }
 
   if (syntax_error) {
+    free(line);
     printf("Syntax error! Line %d\n", line_num);
     return NULL;
   }
@@ -245,7 +245,7 @@ int main() {
     return 1;
   }
 
-  build(rule_list);
+  build_mm(rule_list);
 
   free_list(rule_list);
   fclose(blacksmith);
