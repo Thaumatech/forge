@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "helper.h"
 #include "rules.h"
 #include <ctype.h>
@@ -5,6 +6,100 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+void loading() {
+  struct winsize w;
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+  bool anim = true;
+
+  const char *up[] = {
+      "        ____         ",  " ______/____\\_____   ",
+      "/|                |\\ ", "||       /\\       || ",
+      "||       \\/       || ", "\\|________________|/ ",
+      "        |  |__       ",  "       /|__|  \\______",
+      "      (              ",  "      (              ",
+      "      (______________",  "        |  |         ",
+      "        |  |         ",  "        |__|         ",
+      "        \\__/         ",
+  };
+
+  //   int uplen = term_cols - 5;
+
+  const char *strike[] = {
+      "      _______                     ",
+      "     /_______\\   |      |         ",
+      "    |         |  |      |         ",
+      "    |         | /       |       _ ",
+      "    |         |--|      |------/ \\",
+      "    |   < >   |__|      |______\\_/",
+      "    |         | \\_/\\_/\\_/         ",
+      "    |         |                   ",
+      "    |_________|                   ",
+      "_____\\_______/_____________       ",
+  };
+
+  //   int strikelen = term_cols - 17;
+
+  while (1) {
+    sleep(1);
+    system("clear");
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    if (anim) {
+      int padding_y = (w.ws_row / 2) - (sizeof(up) / sizeof(up[0]));
+      int padding_x = (w.ws_col / 2) - (strlen(up[0]) / 2);
+
+      int height = (sizeof(up) / sizeof(up[0]));
+
+      for (int i = 0; i < padding_y; i++) {
+        printf("\n");
+      }
+      for (int i = 0; i < height; i++) {
+        for (int j = 0; j < padding_x; j++) {
+          printf(" ");
+        }
+        printf("%s\n", up[i]);
+      }
+    } else {
+      int padding_y = (w.ws_row / 2) - (sizeof(strike) / sizeof(strike[0]));
+      int padding_x = (w.ws_col / 2) - (strlen(strike[0]) / 2);
+
+      int height = (sizeof(strike) / sizeof(strike[0]));
+
+      for (int i = 0; i < padding_y; i++) {
+        printf("\n");
+      }
+      for (int i = 0; i < padding_y; i++) {
+        for (int j = 0; j < padding_x; j++) {
+          printf(" ");
+        }
+        printf("%s\n", strike[i]);
+      }
+    }
+    anim = !anim;
+  }
+}
+
+void build(RuleList *rl) {
+  pid_t p = fork();
+  if (p < 0) {
+    perror("Fork Failed\n");
+    return;
+  }
+  if (p == 0) {
+    printf("HELLO CHILD FORK\n");
+
+    loading();
+    return;
+  }
+  if (p > 0) {
+    printf("HELLO PARENT FORK\n");
+    return;
+  }
+}
 
 RuleList *parse(FILE *blacksmith) {
   char *line = NULL;
@@ -19,7 +114,7 @@ RuleList *parse(FILE *blacksmith) {
 
   char *trimmed = NULL;
 
-  RuleList *rule_list = init_list(16, "c");
+  RuleList *rule_list = init_list(8, "c");
 
   while (1) {
     if (cached_line) {
@@ -77,10 +172,10 @@ RuleList *parse(FILE *blacksmith) {
 
         if (STARTSWITH(trimmed, "forge ") || STARTSWITH(trimmed, "smelt ")) {
           if (!new_rule->needs.deps) {
-            printf(
-                "Dependencies are mandetory. Please provide needs before line "
-                "%d's forge.\n",
-                line_num);
+            printf("Dependencies are mandetory. Please provide needs before "
+                   "line "
+                   "%d's forge.\n",
+                   line_num);
             return NULL;
           }
 
@@ -136,24 +231,6 @@ RuleList *parse(FILE *blacksmith) {
   return rule_list;
 }
 
-// DBG
-void print_list(RuleList *rule_list) {
-  printf("Language: %s\n", rule_list->lang);
-  for (int i = 0; i < rule_list->size; i++) {
-    printf("Rule %d\n", i + 1);
-    printf("------------------\n");
-    printf("Action: %s\n", rule_list->data[i]->action);
-    printf("Target: %s\n", rule_list->data[i]->target);
-    printf("Needs: \n");
-    for (int j = 0; j < rule_list->data[i]->needs.dep_count; j++) {
-      printf(" - %s\n", rule_list->data[i]->needs.deps[j]);
-    }
-    printf("------------------\n");
-    printf("Imbue: %s\n", rule_list->data[i]->imbue.flags);
-    printf("------------------\n");
-  }
-}
-
 int main() {
   FILE *blacksmith = fopen("Blacksmith", "r");
 
@@ -168,7 +245,7 @@ int main() {
     return 1;
   }
 
-  print_list(rule_list);
+  build(rule_list);
 
   free_list(rule_list);
   fclose(blacksmith);
