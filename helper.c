@@ -1,6 +1,6 @@
 #include "helper.h"
 #include <ctype.h>
-#include <strings.h>
+#include <string.h>
 
 char *chomp(char *s) {
   while (isspace(*s))

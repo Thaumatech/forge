@@ -2,6 +2,9 @@
 // rules.h
 
 #define STARTSWITH(str, prefix) (strncmp((str), (prefix), strlen(prefix)) == 0)
+#define ENDSWITH(str, suffix)                                                  \
+  (memcmp((str) + (strlen(str) - strlen(suffix), (suffix), strlen(suffix)) ==  \
+          0))
 #define STREQ(a, b) (strcmp((a), (b)) == 0)
 
 // Dependencies such as object files or plain C files.

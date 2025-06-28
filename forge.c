@@ -89,14 +89,9 @@ void build_mm(RuleList *rl) {
   }
   if (p > 0) {
     printf("HELLO PARENT FORK\n");
-    build(rl);
+    //     build(rl);
     kill(p, SIGTERM);
     return;
-  }
-}
-
-void build(RuleList *rl) {
-  for (int i = 0; i < rl->size; i++) {
   }
 }
 

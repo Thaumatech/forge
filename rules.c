@@ -1,7 +1,7 @@
 #include "rules.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 RuleList *init_list(int capacity, char *lang) {
   RuleList *list = malloc(sizeof(RuleList));
