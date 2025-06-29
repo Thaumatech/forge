@@ -2,3 +2,4 @@ forge
 Blacksmith
 *.o
 log.txt
+ansi_codes.md
