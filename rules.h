@@ -21,14 +21,14 @@ typedef struct {
 // A Rule, meaning a chunk of text in the Blacksmith file.
 // E.g:
 //
-// forge main.c
+// forge main:
 //    needs main.o, foo.o
 //    imbue -Wall -v
 typedef struct {
-  char *action;
-  char *target;
-  Needs needs;
-  Imbue imbue;
+  char *action; // "forge", "smelt"
+  char *target; // "main", "foo.o"
+  Needs needs;  // Dependencies. ["main.o", "foo.o"], ["foo.c, bar.c"]
+  Imbue imbue;  // Flags, "-Wall -v", "-Wall -o"
 } Rule;
 
 // List of all Rules. Also stores the language that the

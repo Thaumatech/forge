@@ -4,6 +4,13 @@
 #include <stdio.h>
 
 typedef struct {
+  int child_num;
+  char *name;
+  struct BuildItem *parent;
+  struct BuildItem **children;
+} BuildItem;
+
+typedef struct {
   int size;
   int capacity;
   char **data;
