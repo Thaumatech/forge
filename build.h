@@ -4,10 +4,6 @@
 #include <stdio.h>
 
 typedef struct {
-  char *item;
-} BuildItem;
-
-typedef struct {
   int size;
   int capacity;
   char **data;

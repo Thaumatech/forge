@@ -1,9 +1,11 @@
 #include "forge.h"
+#include "ansi.h"
 #include "debug.h"
 #include "helper.h"
 #include "rules.h"
 
 void loading() {
+  hide_cursor();
   struct winsize w;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
@@ -65,7 +67,7 @@ void loading() {
       for (int i = 0; i < padding_y; i++) {
         printf("\n");
       }
-      for (int i = 0; i < padding_y; i++) {
+      for (int i = 0; i < height; i++) {
         for (int j = 0; j < padding_x; j++) {
           printf(" ");
         }
@@ -90,6 +92,8 @@ void build_mm(RuleList *rl) {
   if (p > 0) {
     printf("HELLO PARENT FORK\n");
     //     build(rl);
+    sleep(10);
+    show_cursor();
     kill(p, SIGTERM);
     return;
   }
