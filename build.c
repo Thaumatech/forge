@@ -2,7 +2,7 @@
 #include "rules.h"
 #include <stdio.h>
 
-BuildQueue init_bq(int capacity) {
+BuildQueue *init_bq(int capacity) {
   BuildQueue *bq = malloc(sizeof(BuildQueue));
   if (!bq)
     return NULL;
@@ -66,8 +66,14 @@ void free_bq(BuildQueue *bq) {
     for (int i = 0; i < bq->size; i++) {
       BuildItem *b = bq->data[i];
 
-      if (b->item) {
+      if (b->name) {
         free(b->item);
+      }
+      if (b->parent) {
+        free(b->parent);
+      }
+      if (b->children) {
+        free(b->children);
       }
 
       free(b);
@@ -75,6 +81,22 @@ void free_bq(BuildQueue *bq) {
     free(bq->data);
   }
   free(bq);
+}
+
+BuildQueue *build_map(RuleList *rl) {
+  BuildQueue *bq = malloc(sizeof(BuildQueue));
+  for (int i = 0; i < rl->size; i++) {
+    Rule *dp = rl->data[i];
+
+    for (int j = 0; j < dp->needs.dep_count; j++) {
+      BuildItem *b = malloc(sizeof(BuildItem));
+      if (!b) {
+        perror("Malloc failed for build item \n");
+        return NULL;
+      }
+      b.name = strdup(dp->needs.deps[j]);
+    }
+  }
 }
 
 void form_queue(RuleList *rl) {
@@ -90,5 +112,3 @@ void form_queue(RuleList *rl) {
 void build(RuleList *rl) {}
 
 void compile(char *str) { system(str); }
-
-void compile_go(char *str) { system(str); }
